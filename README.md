@@ -46,12 +46,25 @@ pip install -e .
 ### Building Sage
 ```bash
 cd pantheon
+vim src/config.yml
+> sage-pantheon:
+>     name: Sage-pantheon
+>     color: green
+>     marker: '+'
 cp third_party/sage-pantheon/sage-pantheon.py src/wrappers/
 src/experiments/setup.py --setup --schemes "sage-pantheon"
 ```
 
 ## Testing Sage
+To ensure that the Sage sender has sufficient time to load the neural network, set `run_first_setup_time` in `test.py` to a large value.
+```python
+self.run_first_setup_time = 20
+```
+
 Testing Sage in pantheon
 ```python
-src/experiments/test.py local --scheme "sage"
+src/experiments/test.py local --scheme "sage-pantheon"
 ```
+
+
+self.run_first_setup_time = 20

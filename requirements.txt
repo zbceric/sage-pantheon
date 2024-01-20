@@ -50,7 +50,8 @@ imageio==2.9.0
 immutables==0.14
 importlib-metadata==3.4.0
 jax==0.2.9
-jaxlib @  https://storage.googleapis.com/jax-releases/nocuda/jaxlib-0.1.60-cp36-none-manylinux2010_x86_64.whl
+# jaxlib @  https://storage.googleapis.com/jax-releases/nocuda/jaxlib-0.1.60-cp36-none-manylinux2010_x86_64.whl
+jaxlib==0.1.63
 joblib==1.0.0
 jsonschema==3.2.0
 Keras-Preprocessing==1.1.2

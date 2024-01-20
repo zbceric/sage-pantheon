@@ -4,7 +4,7 @@
 #include <sys/select.h>
 #include <cstdlib>
 #include <netdb.h> 
-
+#include <stdio.h>
 #include "define.h"
 
 /* 超参数 */
@@ -126,19 +126,6 @@ void usage()
 }
 
 
-void get_local_ip() {
-    char hostname[128];
-    gethostname(hostname, sizeof(hostname));
-    struct hostent *hent = gethostbyname(hostname);
-
-    int ip = ntohl(((struct in_addr*)hent->h_addr)->s_addr);
-    struct in_addr addr;
-    addr.s_addr = htonl(ip);
-    char* ipStr = inet_ntoa(addr);
-    
-    DBGERROR("ip = %s\n", ipStr);
-}
-
 
 /* 启动 server, 被动接受连接的一方 */
 void start_server_pantheon(int client_port)
@@ -215,8 +202,8 @@ void start_server_pantheon(int client_port)
     char container_cmd[500];
     char tmp_cmd[500];
     char pre_cmd[500];
-    sprintf(tmp_cmd, " ");
-    sprintf(pre_cmd, " ");
+    snprintf(tmp_cmd, sizeof(tmp_cmd), " ");
+    snprintf(pre_cmd, sizeof(pre_cmd), " ");
     char cmd[1000];
     char final_cmd[1000];
 
@@ -262,7 +249,7 @@ void start_server_pantheon(int client_port)
      * 实际上只是将 mode 传递给了 tcpactor.py 处理, 交付共享内存用于通信
      */
     DBGERROR("Starting RL in Evalution Mode(0) ...\n%s", cmd);
-    sprintf(cmd,
+    snprintf(cmd, sizeof(cmd),
             "%s %s/tcpactor.py "
             "--base_path=%s --mode=0 --mem_r=%d --mem_w=%d --id=%d "
             "--flows=%d --bw=%d&",
@@ -341,9 +328,6 @@ void start_server_pantheon(int client_port)
     FD_ZERO(&rset);
     listen(sock, 10);        // sock 监听连接请求, 队列中能够存放 10 个连接
     FD_SET(sock, &rset);           // 将描述符 sock[i] 加入到集合 rset
-
-    // 打印 ip 地址
-    get_local_ip();
 
     // Timeout {2min}, if something goes wrong! (Maybe  mahimahi error ...!)
     // 轮询检查读写性, ndfs 设置为 maxfdp+1 (Linux 规定), 将可读性信息写入 rest, 阻塞 2min 等待可读变化
@@ -892,8 +876,8 @@ void* CntThread(void* information)
                      * state candidates
                      * */
                     char message_extra[1000];
-                    sprintf(
-                        message_extra,
+                    snprintf(
+                        message_extra, sizeof(message_extra),
                         "     %.7f %.7f %.7f %.7f   %.7f %.7f    %d %u    "
                         "%.7f %.7f %.7f   %.7f %.7f %.7f   %.7f %.7f %.7f  "
                         "  %.7f %.7f %.7f    %.7f %.7f %.7f    %.7f %.7f "
@@ -959,7 +943,7 @@ void* CntThread(void* information)
                         lost_m.get_avg(), lost_m.get_min(), lost_m.get_max(),
                         lost_l.get_avg(), lost_l.get_min(), lost_l.get_max());
 
-                    sprintf(message,
+                    int ret = snprintf(message, sizeof(message),
                             "%.7f %.7f %s  %.7f   %.7f %.7f   %.7f "
                             "%.7f    %.7f %.7f    %.7f %.7f   %.7f "
                             "%.7f   %.7f %.7f",
@@ -994,8 +978,21 @@ void* CntThread(void* information)
                                 ? round(log2f(cwnd_rate) * 1000) / 1000.
                                 : log2f(0.0001));
 
+                    if (ret < 0)
+                    {
+                        DBGERROR("message trunck");
+                        return ((void*)0);
+                    }
+
                     char message2[1000];
-                    sprintf(message2, "%d %s", msg_id, message); // 补充 msg_id
+                    ret = snprintf(message2, sizeof(message2), "%d %s", msg_id, message); // 补充 msg_id
+                    
+                    if (ret < 0)
+                    {
+                        DBGERROR("message trunck");
+                        return ((void*)0);
+                    }
+                    
                     memcpy(shared_memory, message2,
                            sizeof(message2)); // 拷贝到共享内存
 

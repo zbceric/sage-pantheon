@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from os import path
 from subprocess import check_call
 
@@ -12,18 +14,23 @@ def setup_sage():
 def main():
     args = arg_parser.sender_first(sender_extend=None, receiver_extend=None)
 
-    cc_repo1 = path.join(context.third_party_dir, 'sage_pantheon')
+    cc_repo1 = path.join(context.third_party_dir, 'sage-pantheon')
     cc_repo = path.join(cc_repo1,'sage_rl')
-    rl_fld = path.join(cc_repo, 'rl_module_pantheon')
+    rl_fld = path.join(cc_repo, 'rl_module')
     send_src = path.join(rl_fld, 'sage')
     recv_src = path.join(rl_fld, 'client')
 
     if args.option == 'setup':
-        sh_cmd = './build.sh'
-        check_call(sh_cmd, shell=True, cwd=cc_repo1)
-        sh_cmd = './cp_models.sh'
-        check_call(sh_cmd, shell=True, cwd=cc_repo1)
-
+        sh_path  = path.join(cc_repo, 'build.sh')
+        mod_cmd = 'chmod +x ' + sh_path
+        print(mod_cmd)
+        check_call(mod_cmd, shell=True, cwd=cc_repo1)
+        check_call(sh_path, shell=True, cwd=cc_repo1)
+        sh_path = path.join(cc_repo, 'cp_models.sh')
+        mod_cmd = 'chmod +x ' + sh_path
+        check_call(mod_cmd, shell=True, cwd=cc_repo1)
+        check_call(sh_path, shell=True, cwd=cc_repo1)
+    
     if args.option == 'setup_after_reboot':
         setup_sage()
         return

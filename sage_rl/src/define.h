@@ -283,7 +283,7 @@ public:
     {
         return (T)(get_avg() * this->dq->size()); // avg * size
     }
-    int add(T entry) // 添加一个元素
+    void add(T entry) // 添加一个元素
     {
         T   new_min = get_min();
         T   new_max = get_max();
