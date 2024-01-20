@@ -1,0 +1,5 @@
+*.o											# 忽略以 .o 结尾的文件
+.vscode/									# 忽略 .vscode 文件夹
+./sage_rl/__pycache__
+./sage_rl/log
+./sage_rl/dataset
