@@ -8,8 +8,7 @@ import context
 from helpers import kernel_ctl
 import sys
 def setup_sage():
-    sys.stderr.write("Before using Sage in Pantheon, \
-                      make sure you have installed conda and the proper Kernel patches (4.19.112-0062)") 
+    sys.stderr.write("Before using Sage in Pantheon, make sure you have installed conda and the proper Kernel patches (4.19.112-0062)") 
 
 def main():
     args = arg_parser.sender_first(sender_extend=None, receiver_extend=None)
